@@ -19,10 +19,16 @@ from oslo_config import cfg
 
 from st2common import config as common_config
 from st2common.constants import system as sys_constants
+from st2common.constants.system import DEFAULT_CONFIG_FILE_PATH
+from st2common import log as logging
+
+
+LOG = logging.getLogger(__name__)
 
 
 def parse_args(args=None):
-    cfg.CONF(args=args, version=sys_constants.VERSION_STRING)
+    cfg.CONF(args=args, version=sys_constants.VERSION_STRING,
+             default_config_files=[DEFAULT_CONFIG_FILE_PATH])
 
 
 def register_opts():
@@ -56,10 +62,18 @@ def _register_service_opts():
             'gc_interval', default=10,
             help='How often (in seconds) to look for zombie execution requests before rescheduling '
                  'them.'),
-
+        cfg.IntOpt(
+            'retry_max_attempt', default=10,
+            help='The maximum number of attempts that the scheduler retries on error.'),
+        cfg.IntOpt(
+            'retry_wait_msec', default=3000,
+            help='The number of milliseconds to wait in between retries.')
     ]
 
     cfg.CONF.register_opts(scheduler_opts, group='scheduler')
 
 
-register_opts()
+try:
+    register_opts()
+except cfg.DuplicateOptError:
+    LOG.exception('The scheduler configuration options are already parsed and loaded.')

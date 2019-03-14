@@ -18,7 +18,7 @@ from __future__ import absolute_import
 import copy
 import mock
 
-from orquesta import states as wf_states
+from orquesta import statuses as wf_statuses
 
 import st2tests
 
@@ -107,15 +107,16 @@ class OrquestaContextTest(st2tests.ExecutionDbTestCase):
         t1_ex_db = wf_db_access.TaskExecution.get_by_id(str(t1_ex_db.id))
         wf_ex_db = wf_db_access.WorkflowExecution.get_by_id(str(wf_ex_db.id))
         lv_ac_db = lv_db_access.LiveAction.get_by_id(str(lv_ac_db.id))
-        self.assertEqual(t1_ex_db.status, wf_states.SUCCEEDED)
-        self.assertEqual(wf_ex_db.status, wf_states.SUCCEEDED)
+        self.assertEqual(t1_ex_db.status, wf_statuses.SUCCEEDED)
+        self.assertEqual(wf_ex_db.status, wf_statuses.SUCCEEDED)
         self.assertEqual(lv_ac_db.status, ac_const.LIVEACTION_STATUS_SUCCEEDED)
 
         # Check result.
         expected_st2_ctx = {
             'action_execution_id': str(ac_ex_db.id),
             'api_url': 'http://127.0.0.1/v1',
-            'user': 'stanley'
+            'user': 'stanley',
+            'pack': 'orquesta_tests'
         }
 
         expected_st2_ctx_with_wf_ex_id = copy.deepcopy(expected_st2_ctx)
@@ -145,9 +146,9 @@ class OrquestaContextTest(st2tests.ExecutionDbTestCase):
         t1_ex_db = wf_db_access.TaskExecution.query(workflow_execution=str(wf_ex_db.id))[0]
         t1_ac_ex_db = ex_db_access.ActionExecution.query(task_execution=str(t1_ex_db.id))[0]
         t1_wf_ex_db = wf_db_access.WorkflowExecution.query(action_execution=str(t1_ac_ex_db.id))[0]
-        self.assertEqual(t1_ex_db.status, wf_states.RUNNING)
+        self.assertEqual(t1_ex_db.status, wf_statuses.RUNNING)
         self.assertEqual(t1_ac_ex_db.status, ac_const.LIVEACTION_STATUS_RUNNING)
-        self.assertEqual(t1_wf_ex_db.status, wf_states.RUNNING)
+        self.assertEqual(t1_wf_ex_db.status, wf_statuses.RUNNING)
 
         # Complete subworkflow under task1.
         query_filters = {'workflow_execution': str(t1_wf_ex_db.id), 'task_id': 'task1'}
@@ -167,7 +168,7 @@ class OrquestaContextTest(st2tests.ExecutionDbTestCase):
 
         t1_wf_ex_db = wf_db_access.WorkflowExecution.get_by_id(str(t1_wf_ex_db.id))
         t1_ac_ex_db = ex_db_access.ActionExecution.get_by_id(str(t1_ac_ex_db.id))
-        self.assertEqual(t1_wf_ex_db.status, wf_states.SUCCEEDED)
+        self.assertEqual(t1_wf_ex_db.status, wf_statuses.SUCCEEDED)
         self.assertEqual(t1_ac_ex_db.status, ac_const.LIVEACTION_STATUS_SUCCEEDED)
 
         # Complete task1 and main workflow.
@@ -175,8 +176,8 @@ class OrquestaContextTest(st2tests.ExecutionDbTestCase):
         t1_ex_db = wf_db_access.TaskExecution.get_by_id(str(t1_ex_db.id))
         wf_ex_db = wf_db_access.WorkflowExecution.get_by_id(str(wf_ex_db.id))
         lv_ac_db = lv_db_access.LiveAction.get_by_id(str(lv_ac_db.id))
-        self.assertEqual(t1_ex_db.status, wf_states.SUCCEEDED)
-        self.assertEqual(wf_ex_db.status, wf_states.SUCCEEDED)
+        self.assertEqual(t1_ex_db.status, wf_statuses.SUCCEEDED)
+        self.assertEqual(wf_ex_db.status, wf_statuses.SUCCEEDED)
         self.assertEqual(lv_ac_db.status, ac_const.LIVEACTION_STATUS_SUCCEEDED)
 
         # Check result.
@@ -201,9 +202,9 @@ class OrquestaContextTest(st2tests.ExecutionDbTestCase):
         t1_ex_db = wf_db_access.TaskExecution.query(workflow_execution=str(wf_ex_db.id))[0]
         t1_ac_ex_db = ex_db_access.ActionExecution.query(task_execution=str(t1_ex_db.id))[0]
         t1_wf_ex_db = wf_db_access.WorkflowExecution.query(action_execution=str(t1_ac_ex_db.id))[0]
-        self.assertEqual(t1_ex_db.status, wf_states.RUNNING)
+        self.assertEqual(t1_ex_db.status, wf_statuses.RUNNING)
         self.assertEqual(t1_ac_ex_db.status, ac_const.LIVEACTION_STATUS_RUNNING)
-        self.assertEqual(t1_wf_ex_db.status, wf_states.RUNNING)
+        self.assertEqual(t1_wf_ex_db.status, wf_statuses.RUNNING)
 
         # Complete subworkflow under task1.
         query_filters = {'workflow_execution': str(t1_wf_ex_db.id), 'task_id': 'task1'}
@@ -223,7 +224,7 @@ class OrquestaContextTest(st2tests.ExecutionDbTestCase):
 
         t1_wf_ex_db = wf_db_access.WorkflowExecution.get_by_id(str(t1_wf_ex_db.id))
         t1_ac_ex_db = ex_db_access.ActionExecution.get_by_id(str(t1_ac_ex_db.id))
-        self.assertEqual(t1_wf_ex_db.status, wf_states.SUCCEEDED)
+        self.assertEqual(t1_wf_ex_db.status, wf_statuses.SUCCEEDED)
         self.assertEqual(t1_ac_ex_db.status, ac_const.LIVEACTION_STATUS_SUCCEEDED)
 
         # Complete task1 and main workflow.
@@ -231,8 +232,8 @@ class OrquestaContextTest(st2tests.ExecutionDbTestCase):
         t1_ex_db = wf_db_access.TaskExecution.get_by_id(str(t1_ex_db.id))
         wf_ex_db = wf_db_access.WorkflowExecution.get_by_id(str(wf_ex_db.id))
         lv_ac_db = lv_db_access.LiveAction.get_by_id(str(lv_ac_db.id))
-        self.assertEqual(t1_ex_db.status, wf_states.SUCCEEDED)
-        self.assertEqual(wf_ex_db.status, wf_states.SUCCEEDED)
+        self.assertEqual(t1_ex_db.status, wf_statuses.SUCCEEDED)
+        self.assertEqual(wf_ex_db.status, wf_statuses.SUCCEEDED)
         self.assertEqual(lv_ac_db.status, ac_const.LIVEACTION_STATUS_SUCCEEDED)
 
         # Check result.
